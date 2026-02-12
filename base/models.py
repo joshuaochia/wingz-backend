@@ -34,7 +34,7 @@ class User(AbstractUser):
     )
     
     phone_number = models.CharField(
-        max_length=20,
+        max_length=50,
         blank=True,
         null=True,
         help_text="User's phone number"
