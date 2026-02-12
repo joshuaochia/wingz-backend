@@ -5,7 +5,7 @@ import structlog
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
-
+PROJECT_ROOT = BASE_DIR.parent  
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = os.getenv("SECRET_KEY", "")
 ALLOWED_HOSTS = []
@@ -55,6 +55,7 @@ SPECTACULAR_SETTINGS = {
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    "whitenoise.middleware.WhiteNoiseMiddleware",
     # django-structlog
     "django_structlog.middlewares.RequestMiddleware",
     # API logging
@@ -175,6 +176,11 @@ USE_TZ = True
 
 STATIC_URL = 'static/'
 
+# Add this for collectstatic
+STATIC_ROOT = PROJECT_ROOT / 'staticfiles'
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 AUTH_USER_MODEL = "base.User"
+

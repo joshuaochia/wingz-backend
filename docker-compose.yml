@@ -4,6 +4,7 @@ services:
       context: .
     volumes:
       - .:/home/app/web
+      - staticfiles:/home/app/web/staticfiles
     ports:
       - "8000:8000"
     command: "python manage.py runserver 0.0.0.0:8000"
@@ -34,3 +35,4 @@ services:
 
 volumes:
   db_data:
+  staticfiles:

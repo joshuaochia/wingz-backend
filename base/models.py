@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
+from django.conf import settings
 
 
 class User(AbstractUser):
@@ -66,14 +67,14 @@ class Ride(models.Model):
     
     # Foreign keys to User model
     id_rider = models.ForeignKey(
-        User,
+        settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
         related_name='rides_as_rider',
         help_text="User who requested the ride"
     )
     
     id_driver = models.ForeignKey(
-        User,
+        settings.AUTH_USER_MODEL,
         on_delete=models.SET_NULL,
         null=True,
         blank=True,

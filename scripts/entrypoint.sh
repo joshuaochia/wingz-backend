@@ -21,6 +21,15 @@ else
     echo "Skipping migrations (dev mode)"
 fi
 
+# STATICFILES HANDLING
+echo "Preparing static files..."
+mkdir -p "$APP_HOME/staticfiles"
+
+# Remove the problematic chmod and rm commands
+# Just let collectstatic handle everything
+python manage.py collectstatic --noinput --clear
+
+
 if [ "$QCLUSTER" = "true" ]; then
     echo "Starting Django Q cluster..."
     exec python manage.py qcluster
