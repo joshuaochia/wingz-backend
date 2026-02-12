@@ -17,7 +17,14 @@ class User(AbstractUser):
         ('driver', 'Driver'),
         ('rider', 'Rider'),
     ]
-    
+
+    # Override email to make it unique, required, and indexed
+    email = models.EmailField(
+        unique=True, 
+        db_index=True,
+        help_text="User's unique email address"
+    )
+
     # Additional fields not in AbstractUser
     role = models.CharField(
         max_length=20,
@@ -38,6 +45,12 @@ class User(AbstractUser):
         """Alias for compatibility with your naming convention"""
         return self.id
 
+    class Meta:
+        # Adding explicit indexes for the Meta class as well
+        indexes = [
+            models.Index(fields=['email']),
+            models.Index(fields=['role']),
+        ]
 
 class Ride(models.Model):
     """

@@ -48,3 +48,20 @@ class RideViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAdmin]
     pagination_class = RidePagination
     lookup_field = 'id_ride'
+
+    def get_queryset(self):
+        queryset = Ride.objects.select_related(
+            'id_rider', 'id_driver'
+        ).prefetch_related(
+            'events'
+        ).order_by('-created_at')
+
+        status = self.request.query_params.get('status')
+        rider_email = self.request.query_params.get('rider_email')
+
+        if status:
+            queryset = queryset.filter(status=status)
+        if rider_email:
+            queryset = queryset.filter(id_rider__email__icontains=rider_email)
+
+        return queryset

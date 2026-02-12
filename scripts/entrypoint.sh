@@ -22,17 +22,20 @@ else
 fi
 
 # STATICFILES HANDLING
-echo "Preparing static files..."
-mkdir -p "$APP_HOME/staticfiles"
-
-# Remove the problematic chmod and rm commands
-# Just let collectstatic handle everything
-python manage.py collectstatic --noinput --clear
-
+if [ "$DJANGO_ENV" != "dev" ]; then
+    echo "Preparing static files..."
+    mkdir -p "$APP_HOME/staticfiles"
+    python manage.py collectstatic --noinput --clear
+else
+    echo "Skipping collectstatic (dev mode)"
+fi
 
 if [ "$QCLUSTER" = "true" ]; then
     echo "Starting Django Q cluster..."
     exec python manage.py qcluster
+elif [ "$DJANGO_ENV" = "dev" ]; then
+    echo "Starting dev env..."
+    exec python manage.py runserver 0.0.0.0:8000
 else
     echo "Starting Gunicorn web server..."
     exec gunicorn app.wsgi:application --bind 0.0.0.0:8000

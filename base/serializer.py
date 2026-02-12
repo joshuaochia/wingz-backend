@@ -23,10 +23,27 @@ class UserSerializer(serializers.ModelSerializer):
         read_only_fields = ['id', 'email', 'first_name', 'last_name', 'role', 'phone_number']
 
 
+class RideEventSerializer(serializers.ModelSerializer):
+    """
+    Serializer for the RideEvent model.
+    """
+    class Meta:
+        model = RideEvent
+        fields = [
+            'id_ride_event',
+            'id_ride',
+            'description',
+            'created_at',
+        ]
+        read_only_fields = ['id_ride_event', 'created_at']
+
+
 class RideSerializer(serializers.ModelSerializer):
     """
     Serializer for the Ride model.
     """
+    events = RideEventSerializer(many=True, read_only=True)
+
     class Meta:
         model = Ride
         fields = [
@@ -41,20 +58,8 @@ class RideSerializer(serializers.ModelSerializer):
             'pickup_time',
             'created_at',
             'updated_at',
+            'events'
         ]
-        read_only_fields = ['id_ride', 'created_at', 'updated_at']
+        read_only_fields = ['id_ride', 'created_at', 'updated_at', 'events']
 
 
-class RideEventSerializer(serializers.ModelSerializer):
-    """
-    Serializer for the RideEvent model.
-    """
-    class Meta:
-        model = RideEvent
-        fields = [
-            'id_ride_event',
-            'id_ride',
-            'description',
-            'created_at',
-        ]
-        read_only_fields = ['id_ride_event', 'created_at']
