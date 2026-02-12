@@ -30,6 +30,7 @@ INSTALLED_APPS = [
     # Third-party apps
     "drf_spectacular",
     "django_structlog",
+    "django_filters",
 
     # Django apps
     "base",

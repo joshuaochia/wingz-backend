@@ -43,14 +43,16 @@ class RideSerializer(serializers.ModelSerializer):
     Serializer for the Ride model.
     """
     events = RideEventSerializer(many=True, read_only=True)
+    rider = UserSerializer(source="id_rider", read_only=True)
+    driver = UserSerializer(source="id_driver", read_only=True)
 
     class Meta:
         model = Ride
         fields = [
             'id_ride',
             'status',
-            'id_rider',
-            'id_driver',
+            'rider',
+            'driver',
             'pickup_latitude',
             'pickup_longitude',
             'dropoff_latitude',

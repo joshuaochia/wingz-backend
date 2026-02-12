@@ -2,12 +2,16 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny
 from rest_framework import viewsets
+from rest_framework.filters import OrderingFilter
+from django_filters.rest_framework import DjangoFilterBackend
+
 from schema.base.health_check import schema_health_check
 
 from .models import Ride
 from .permissions import IsAdmin
 from .pagination import RidePagination
 from .serializer import RideSerializer
+from .filters import RideFilter
 
 
 class HealthCheckView(APIView):
@@ -22,15 +26,7 @@ class HealthCheckView(APIView):
 class RideViewSet(viewsets.ModelViewSet):
     """
     ViewSet for managing rides (full CRUD).
-    
-    Provides:
-    - list: GET /api/rides/
-    - retrieve: GET /api/rides/{id_ride}/
-    - create: POST /api/rides/
-    - update: PUT /api/rides/{id_ride}/
-    - partial_update: PATCH /api/rides/{id_ride}/
-    - delete: DELETE /api/rides/{id_ride}/
-    
+
     Features:
     - Nested RideEvents and Users (id_rider, id_driver)
     - Pagination support
@@ -49,19 +45,10 @@ class RideViewSet(viewsets.ModelViewSet):
     pagination_class = RidePagination
     lookup_field = 'id_ride'
 
-    def get_queryset(self):
-        queryset = Ride.objects.select_related(
-            'id_rider', 'id_driver'
-        ).prefetch_related(
-            'events'
-        ).order_by('-created_at')
-
-        status = self.request.query_params.get('status')
-        rider_email = self.request.query_params.get('rider_email')
-
-        if status:
-            queryset = queryset.filter(status=status)
-        if rider_email:
-            queryset = queryset.filter(id_rider__email__icontains=rider_email)
-
-        return queryset
+    # Modular Backends
+    filter_backends = [DjangoFilterBackend, OrderingFilter]
+    filterset_class = RideFilter
+    
+    # Sorting Configuration
+    ordering_fields = ['pickup_time', 'distance', 'created_at']
+    ordering = ['-created_at']
