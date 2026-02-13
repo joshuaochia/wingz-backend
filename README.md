@@ -1,6 +1,3 @@
-Readme · MD
-Copy
-
 # Django Ride Management API
 
 A Django REST Framework application for managing ride events, rides, and users with advanced filtering, sorting, and geolocation features.
@@ -154,10 +151,10 @@ This project uses **dj-rest-auth** for authentication.
 
 > **Authorization Required**: All API endpoints require admin authentication.
 >
-> Include the token in the request header:
+> Include the bearer in the request header:
 >
 > ```
-> Authorization: Token <your_auth_token>
+> Authorization: Bearer <your_auth_token>
 > ```
 
 #### Get Users
