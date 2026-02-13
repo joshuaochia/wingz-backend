@@ -2,15 +2,6 @@
 
 A Django REST Framework application for managing ride events, rides, and users with advanced filtering, sorting, and geolocation features.
 
-## Table of Contents
-
-- [Project Architecture](#project-architecture)
-- [Prerequisites](#prerequisites)
-- [Getting Started](#getting-started)
-- [API Documentation](#api-documentation)
-- [Project Structure](#project-structure)
-- [Development](#development)
-
 ---
 
 ## Project Architecture
@@ -119,7 +110,7 @@ http://localhost:8000
 
 ### Authentication
 
-This project uses **dj-rest-auth** for authentication.
+This project uses **dj-rest-auth** and **SimpleJWT** for authentication.
 
 #### Login Endpoint
 
@@ -139,7 +130,8 @@ This project uses **dj-rest-auth** for authentication.
 
 ```json
 {
-  "key": "your_auth_token"
+  "access": "your_auth_token",
+  "refresh": "your_refresh_token"
 }
 ```
 
@@ -223,136 +215,11 @@ Available status values:
 
 ---
 
-### Combined Filtering and Sorting
-
-You can combine multiple query parameters:
-
-**GET** `/api/base/rides/?status=en-route&rider_email=rider@example.com&ordering=pickup_time`
-
----
-
-## Project Structure
-
-### Settings Management
-
-The project uses environment-specific settings:
-
-- **base.py**: Common settings shared across all environments
-- **dev.py**: Development-specific settings (Debug=True, local database)
-- **prod.py**: Production-specific settings (Debug=False, security hardening)
-
-### Custom Management Commands
-
-- **seed_data**: Populates the database with test data for rapid development
-- **clear_data**: Removes all seeded data from the database
-
-### Middleware
-
-- **API Logging Middleware**: Logs all API requests and responses for debugging and monitoring
-
----
-
-## Development
-
-### Creating Superuser
-
-```bash
-python manage.py createsuperuser
-```
-
-### Accessing Django Admin
-
-Navigate to: `http://localhost:8000/admin/`
-
----
-
-## API Schema
-
-This project uses **DRF Spectacular** for API schema generation.
-
 ### View API Schema
 
 **Swagger UI**: `http://localhost:8000/api/schema/swagger-ui/`
 
 **ReDoc**: `http://localhost:8000/api/schema/redoc/`
-
----
-
-## Environment Variables
-
-Create a `.env` file in the project root with the following variables:
-
-```env
-DEBUG=True
-SECRET_KEY=your-secret-key
-DATABASE_URL=postgresql://user:password@db:5432/dbname
-ALLOWED_HOSTS=localhost,127.0.0.1
-```
-
----
-
-## Troubleshooting
-
-### Container Won't Start
-
-1. Check Docker logs:
-
-   ```bash
-   docker-compose logs
-   ```
-
-2. Rebuild containers:
-   ```bash
-   docker-compose down
-   docker-compose up --build
-   ```
-
-### Database Connection Issues
-
-Ensure the database container is running:
-
-```bash
-docker ps
-```
-
-### Migration Errors
-
-Reset migrations (development only):
-
-```bash
-python manage.py migrate --fake-initial
-```
-
----
-
-## Contributing
-
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
-
----
-
-## License
-
-[Specify your license here]
-
----
-
-## Support
-
-For issues and questions, please open an issue in the repository.
-
----
-
-## Acknowledgments
-
-- Django REST Framework
-- dj-rest-auth
-- DRF Spectacular
-- Docker
 
 ---
 
