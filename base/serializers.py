@@ -12,15 +12,13 @@ class UserSerializer(serializers.ModelSerializer):
         model = User
         fields = [
             'id',
-            'username',
             'email',
-            'first_name',
-            'last_name',
             'role',
             'phone_number',
-
+            'first_name',
+            'last_name'
         ]
-        read_only_fields = ['id', 'email', 'first_name', 'last_name', 'role', 'phone_number']
+        read_only_fields = ['id', 'email', 'role', 'phone_number', 'first_name', 'last_name']
 
 
 class RideEventSerializer(serializers.ModelSerializer):
@@ -42,7 +40,8 @@ class RideSerializer(serializers.ModelSerializer):
     """
     Serializer for the Ride model.
     """
-    events = RideEventSerializer(many=True, read_only=True)
+
+    todays_ride_events = serializers.SerializerMethodField()
     rider = UserSerializer(source="id_rider", read_only=True)
     driver = UserSerializer(source="id_driver", read_only=True)
 
@@ -50,9 +49,9 @@ class RideSerializer(serializers.ModelSerializer):
         model = Ride
         fields = [
             'id_ride',
+            "driver",
+            "rider",
             'status',
-            'rider',
-            'driver',
             'pickup_latitude',
             'pickup_longitude',
             'dropoff_latitude',
@@ -60,8 +59,10 @@ class RideSerializer(serializers.ModelSerializer):
             'pickup_time',
             'created_at',
             'updated_at',
-            'events'
+            'todays_ride_events',
         ]
-        read_only_fields = ['id_ride', 'created_at', 'updated_at', 'events']
 
-
+    def get_todays_ride_events(self, obj):
+        # Use the prefetched 'todays_events' to avoid extra queries
+        events = getattr(obj, 'todays_events', [])
+        return RideEventSerializer(events, many=True).data

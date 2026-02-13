@@ -40,11 +40,6 @@ class User(AbstractUser):
         help_text="User's phone number"
     )
 
-    @property
-    def id_user(self):
-        """Alias for compatibility with your naming convention"""
-        return self.id
-
     class Meta:
         # Adding explicit indexes for the Meta class as well
         indexes = [

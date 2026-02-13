@@ -19,17 +19,27 @@ class Command(BaseCommand):
         # 1. Create both Riders and Drivers
         riders = [User.objects.create_user(
             username=fake.unique.user_name(), email=fake.unique.email(),
-            role='rider', phone_number=fake.numerify('##########')
+            role='rider', phone_number=fake.numerify('##########'),
+            first_name=fake.first_name(), last_name=fake.last_name()
         ) for _ in range(10)]
         
         drivers = [User.objects.create_user(
             username=fake.unique.user_name(), email=fake.unique.email(),
-            role='driver', phone_number=fake.numerify('##########')
+            role='driver', phone_number=fake.numerify('##########'),
+            first_name=fake.first_name(), last_name=fake.last_name()
         ) for _ in range(5)]
 
-        # 2. Create 20 Rides
+        # 2. Create 20 Rides with pickup/dropoff events
         rides = []
-        for _ in range(20):
+        
+        # Only 3-5 rides will qualify (>1 hour)
+        qualifying_ride_indices = random.sample(range(20), k=random.randint(3, 5))
+        
+        for i in range(20):
+            # Determine pickup time - spread across last 60 days with varied times
+            total_minutes_ago = random.randint(60, 86400)  # 1 hour to 60 days in minutes
+            pickup_time = now - timedelta(minutes=total_minutes_ago)
+            
             ride = Ride.objects.create(
                 status=random.choice(['completed', 'en-route']),
                 id_rider=random.choice(riders),
@@ -38,40 +48,64 @@ class Command(BaseCommand):
                 pickup_longitude=float(fake.longitude()),
                 dropoff_latitude=float(fake.latitude()),
                 dropoff_longitude=float(fake.longitude()),
-                pickup_time=now - timedelta(days=random.randint(1, 5))
+                pickup_time=pickup_time
             )
             rides.append(ride)
-
-        # 3. Create 5,000 RideEvents with time distribution
-        self.stdout.write("Generating 5,000 events...")
-        events_to_create = []
-        
-        for i in range(5000):
-            # Distribute events: 
-            # 30% -> 24h ago | 30% -> 2 days ago | 40% -> 3-7 days ago
-            rand = random.random()
-            if rand < 0.3:
-                offset = timedelta(hours=random.randint(0, 23)) # Within last 24h
-            elif rand < 0.6:
-                offset = timedelta(days=1, hours=random.randint(0, 23)) # 24-48h ago
-            else:
-                offset = timedelta(days=random.randint(2, 7)) # 2+ days ago
-
-            event_time = now - offset
             
-            events_to_create.append(RideEvent(
+            # Create pickup event
+            pickup_event = RideEvent.objects.create(
+                id_ride=ride,
+                description='Status changed to pickup'
+            )
+            # Update the timestamp
+            RideEvent.objects.filter(id_ride_event=pickup_event.id_ride_event).update(
+                created_at=pickup_time
+            )
+            
+            # Create dropoff event
+            # Only qualifying rides get >1 hour duration
+            if i in qualifying_ride_indices:
+                # Trip duration between 1.5 to 4 hours (QUALIFIES)
+                trip_duration_minutes = random.randint(90, 240)  # 1.5-4 hours
+            else:
+                # Trip duration less than 1 hour (does NOT qualify)
+                trip_duration_minutes = random.randint(5, 58)  # 5-58 minutes
+            
+            dropoff_time = pickup_time + timedelta(minutes=trip_duration_minutes)
+            
+            dropoff_event = RideEvent.objects.create(
+                id_ride=ride,
+                description='Status changed to dropoff'
+            )
+            # Update the timestamp
+            RideEvent.objects.filter(id_ride_event=dropoff_event.id_ride_event).update(
+                created_at=dropoff_time
+            )
+
+        # 3. Create additional random events (60 more to reach ~100 total)
+        self.stdout.write("Generating additional events...")
+        
+        for i in range(60):
+            # Random time in the past (up to 60 days)
+            minutes_ago = random.randint(60, 86400)  # 1 hour to 60 days
+            event_time = now - timedelta(minutes=minutes_ago)
+            
+            event = RideEvent.objects.create(
                 id_ride=random.choice(rides),
-                description=f"Performance Test Event {i}: {fake.sentence()}",
+                description=f"Additional Event {i}: {fake.sentence()}"
+            )
+            # Update the timestamp
+            RideEvent.objects.filter(id_ride_event=event.id_ride_event).update(
                 created_at=event_time
-            ))
+            )
 
-            # Bulk create in batches of 1000 for efficiency
-            if len(events_to_create) >= 1000:
-                RideEvent.objects.bulk_create(events_to_create)
-                events_to_create = []
-
-        # Final batch
-        if events_to_create:
-            RideEvent.objects.bulk_create(events_to_create)
-
-        self.stdout.write(self.style.SUCCESS("Successfully seeded 5,000 events!"))
+        total_events = 20 * 2 + 60  # pickup + dropoff for each ride + additional events
+        
+        self.stdout.write(self.style.SUCCESS(
+            f"Successfully seeded data!\n"
+            f"- {len(riders)} riders\n"
+            f"- {len(drivers)} drivers\n"
+            f"- {len(rides)} rides\n"
+            f"- {total_events} events\n"
+            f"- {len(qualifying_ride_indices)} rides with trips > 1 hour (qualifying results)"
+        ))

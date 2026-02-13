@@ -2,6 +2,7 @@
 from pathlib import Path
 import os
 import structlog
+from datetime import timedelta
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -31,15 +32,26 @@ INSTALLED_APPS = [
     "drf_spectacular",
     "django_structlog",
     "django_filters",
+    "silk",
 
     # Django apps
     "base",
+    
 ]
+
+REST_USE_JWT = True
+
+SIMPLE_JWT = {
+    # Access token lifetime
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=60),
+    # Refresh token lifetime
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=7),
+}
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
-        'rest_framework.authentication.SessionAuthentication',
-        'rest_framework_simplejwt.authentication.JWTAuthentication',  # JWT for mobile/web
+        # 'rest_framework.authentication.SessionAuthentication',
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
     ),
     'DEFAULT_PERMISSION_CLASSES': (
         'rest_framework.permissions.IsAuthenticated',
@@ -56,6 +68,7 @@ SPECTACULAR_SETTINGS = {
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'silk.middleware.SilkyMiddleware',
     "whitenoise.middleware.WhiteNoiseMiddleware",
     # django-structlog
     "django_structlog.middlewares.RequestMiddleware",
@@ -68,6 +81,7 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'allauth.account.middleware.AccountMiddleware',
+
 ]
 
 ROOT_URLCONF = 'app.urls'

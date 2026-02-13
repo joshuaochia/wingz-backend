@@ -10,18 +10,19 @@ class RideFilter(filters.FilterSet):
 
     class Meta:
         model = Ride
-        fields = ['status', 'rider_email']
+        fields = []
 
-    @property
-    def qs(self):
+    def filter_queryset(self, queryset):
         """
         Override the queryset property to inject distance logic 
         before filtering/sorting happens.
         """
-        parent_qs = super().qs
+        qs = super().filter_queryset(queryset)
+
         lat = self.request.query_params.get('lat')
         lng = self.request.query_params.get('lng')
-        
+
         if lat and lng:
-            return annotate_distance(parent_qs, lat, lng)
-        return parent_qs
+            qs = annotate_distance(qs, lat, lng)
+
+        return qs

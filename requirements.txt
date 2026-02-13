@@ -16,3 +16,4 @@ django-structlog==10.0.0
 whitenoise==6.5.0
 faker==40.4.0
 django-filter==25.2
+django-silk==5.4.3

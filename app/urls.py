@@ -1,6 +1,6 @@
 from django.urls import path, include
 from dj_rest_auth.views import LoginView, LogoutView
-from rest_framework_simplejwt.views import TokenRefreshView
+from rest_framework_simplejwt.views import TokenRefreshView, TokenObtainPairView
 from django.contrib import admin
 from drf_spectacular.views import (
     SpectacularAPIView,
@@ -10,7 +10,13 @@ from drf_spectacular.views import (
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('api/auth/login/', LoginView.as_view(), name='login'),
+
+    #Silk
+    path('silk/', include('silk.urls', namespace='silk')),
+
+    #DJ Rest auth
+    # path('api/auth/login/', LoginView.as_view(), name='login'),
+    path('api/auth/login/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('api/auth/logout/', LogoutView.as_view(), name='logout'),
     path('api/auth/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
     path('api/auth/registration/', include('dj_rest_auth.registration.urls')),
