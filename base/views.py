@@ -53,7 +53,7 @@ class RideEventsViewSet(viewsets.ModelViewSet):
     pagination_class = BasePagination
 
 
-class RideViewSet(viewsets.ModelViewSet):
+class RideViewSet(viewsets.ReadOnlyModelViewSet):
     """
     ViewSet for managing rides (full CRUD).
 

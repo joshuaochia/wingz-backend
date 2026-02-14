@@ -16,6 +16,40 @@ class Command(BaseCommand):
         now = timezone.now()
         self.stdout.write(f"Starting performance seed at {now}")
 
+        # 0. Create one Admin Superuser
+        admin_email = "admin@example.com"
+        admin_username = "admin"
+        admin_password = "admin123"
+
+        admin_user, created = User.objects.get_or_create(
+            email=admin_email,
+            defaults={
+                "username": admin_username,
+                "first_name": "Admin",
+                "last_name": "User",
+                "role": "admin",
+                "is_staff": True,
+                "is_superuser": True,
+            }
+        )
+
+        self.stdout.write(self.style.NOTICE(
+            "\nADMIN LOGIN DETAILS\n"
+            "-------------------\n"
+            f"Username : {admin_username}\n"
+            f"Email    : {admin_email}\n"
+            f"Password : {admin_password}\n"
+            "Role     : admin\n"
+        ))
+
+        if created:
+            admin_user.set_password(admin_password)
+            admin_user.save()
+            self.stdout.write(self.style.SUCCESS("Admin superuser created"))
+        else:
+            self.stdout.write(self.style.WARNING("Admin superuser already exists"))
+
+
         # 1. Create both Riders and Drivers
         riders = [User.objects.create_user(
             username=fake.unique.user_name(), email=fake.unique.email(),

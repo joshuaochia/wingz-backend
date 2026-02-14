@@ -1,6 +1,8 @@
 from rest_framework import serializers
 from django.contrib.auth import get_user_model
 from .models import Ride, RideEvent
+from django.utils import timezone
+from datetime import timedelta
 
 User = get_user_model()
 
@@ -63,6 +65,11 @@ class RideSerializer(serializers.ModelSerializer):
         ]
 
     def get_todays_ride_events(self, obj):
-        # Use the prefetched 'todays_events' to avoid extra queries
-        events = getattr(obj, 'todays_events', [])
+        if hasattr(obj, 'todays_events'):
+            return RideEventSerializer(obj.todays_events, many=True).data
+        
+        # Fallback for when serializer is used outside ViewSet context
+        events = obj.events.filter(
+            created_at__gte=timezone.now() - timedelta(days=1)
+        )
         return RideEventSerializer(events, many=True).data
