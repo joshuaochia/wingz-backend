@@ -17,3 +17,8 @@ whitenoise==6.5.0
 faker==40.4.0
 django-filter==25.2
 django-silk==5.4.3
+# Testing
+pytest==8.3.4
+pytest-django==4.9.0
+pytest-cov==6.0.0
+pytest-xdist==3.6.1

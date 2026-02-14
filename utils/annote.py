@@ -9,13 +9,7 @@ def annotate_distance(queryset, lat, lng):
     """
     try:
         lat, lng = float(lat), float(lng)
-        
-        # Skip rides with null coordinates to prevent calculation errors
-        queryset = queryset.filter(
-            pickup_latitude__isnull=False,
-            pickup_longitude__isnull=False
-        )
-        
+
         distance_expr = 6371 * ACos(
             Cos(Radians(lat)) * Cos(Radians(F('pickup_latitude'))) *
             Cos(Radians(F('pickup_longitude')) - Radians(lng)) +
