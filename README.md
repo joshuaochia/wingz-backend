@@ -24,13 +24,15 @@ project/
 │   │       ├── clear_data.py    # Clear seeded data
 │   │       └── seed_data.py     # Seed test data
 │   ├── admin.py             # Django admin configuration
+│   ├── tests/
+│   │   └── test_ride_viewset.py
+│   ├── admin.py             # Django admin configuration
 │   ├── apps.py              # App configuration
 │   ├── models.py            # Database models
 │   ├── filters.py           # DRF filter classes
 │   ├── paginations.py       # Custom pagination
 │   ├── permissions.py       # Custom permissions
 │   ├── serializers.py       # DRF serializers
-│   ├── tests.py             # Unit tests
 │   ├── urls.py              # App URL patterns
 │   └── views.py             # API views
 │
